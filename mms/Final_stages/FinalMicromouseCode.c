@@ -8,6 +8,11 @@
 #define height 16
 
 
+
+short currentX = 0, currentY = 15;    
+char direction = 'u'; //initial Direction
+short deltaRow = -1, deltaColumn = 0;
+
 /*-----------------------------------------------------------------------------------------------------------------------------------*/
 /*                                                     Structs and custom data datatypes                                             */
 /*-----------------------------------------------------------------------------------------------------------------------------------*/
@@ -23,13 +28,13 @@ struct Cell {
 /*  int first;     // X coordinate
     int second;   //  Y coordinate*/
 typedef struct {
-    int first;     // X coordinate
-    int second;   //  Y coordinate
-} TwoInts;
+    short first;     // X coordinate
+    short second;   //  Y coordinate
+} Twoshorts;
 
 // Define a node in the queue
 typedef struct Node {
-    TwoInts data;
+    Twoshorts data;
     struct Node* next;
 } Node;
 
@@ -51,7 +56,7 @@ Queue* createQueue() {
 }
 
 // Add an element to the queue
-void enqueue(Queue* q, int x, int y) {
+void enqueue(Queue* q, short x, short y) {
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->data.first = x;
     newNode->data.second = y;
@@ -67,9 +72,9 @@ void enqueue(Queue* q, int x, int y) {
 }
 
 // Remove an element from the queue
-TwoInts dequeue(Queue* q) {
+Twoshorts dequeue(Queue* q) {
     if (q->front == NULL) {
-        return (TwoInts){-1, -1}; // Queue is empty
+        return (Twoshorts){-1, -1}; // Queue is empty
     }
     
     Node* temp = q->front;
@@ -79,13 +84,13 @@ TwoInts dequeue(Queue* q) {
         q->rear = NULL;
     }
     
-    TwoInts value = temp->data;
+    Twoshorts value = temp->data;
     free(temp); // Free the memory of the dequeued node
     return value;
 }
 
 // Check if the queue is empty
-int isEmpty(Queue* q) {
+short isEmpty(Queue* q) {
     return q->front == NULL;
 }
 
@@ -101,10 +106,10 @@ void freeQueue(Queue* q) {
 /*                                                    Logic and Solving related Functions                                            */
 /*-----------------------------------------------------------------------------------------------------------------------------------*/
 
-void resetManhattanForFloodfill(int array[][width],int rows, int columns, int goalX, int goalY){  //change width to 16 in final code
+void resetManhattanForFloodfill(short array[][width],short rows, short columns, short goalX, short goalY){  //change width to 16 in final code
 
-    for (int i = 0; i < rows; i++){
-        for (int j = 0; j < columns; j++)
+    for (short i = 0; i < rows; i++){
+        for (short j = 0; j < columns; j++)
             array[i][j] = -1;
     }
     array[goalY][goalX] = 0;
@@ -114,8 +119,8 @@ void resetManhattanForFloodfill(int array[][width],int rows, int columns, int go
 void resetWallsWithBorder(struct Cell maze[][width]){
 
     // Initialize the maze cells with a typucal wall maze layout
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < width; j++) {
+    for (short i = 0; i < width; i++) {
+        for (short j = 0; j < width; j++) {
             maze[i][j].hasWallNorth = false;
             maze[i][j].hasWallSouth = false;
             maze[i][j].hasWallWest = false;
@@ -123,27 +128,27 @@ void resetWallsWithBorder(struct Cell maze[][width]){
         }
     }
     
-    for (int i = 0; i<width; i++){
+    for (short i = 0; i<width; i++){
         maze[0][i].hasWallNorth = true;
     }
 
-    for (int i = 0; i<width; i++){
+    for (short i = 0; i<width; i++){
         maze[width-1][i].hasWallSouth = true;
     }
     
-    for (int i = 0; i<width; i++){
+    for (short i = 0; i<width; i++){
         maze[i][0].hasWallWest = true;
     }
 
-    for (int i = 0; i<width; i++){
+    for (short i = 0; i<width; i++){
         maze[i][width-1].hasWallEast = true;
     }
 }
 
-void floodfill(int array[][width], struct Cell walls[][width], int rows, int columns, int goalX, int goalY){   //change width to 16 in final code
+void floodfill(short array[][width], struct Cell walls[][width], short rows, short columns, short goalX, short goalY){   //change width to 16 in final code
 
     
-    TwoInts Point;
+    Twoshorts Point;
     Queue* queue = createQueue(); 
     enqueue(queue,goalX,goalY);  //adding to the q the goal cell and the 0 has been defined by the other function hopefully
     while( !isEmpty(queue) ){
@@ -262,24 +267,24 @@ void floodfill(int array[][width], struct Cell walls[][width], int rows, int col
 /*-----------------------------------------------------------------------------------------------------------------------------------*/
 
 //for movement steps
-void getDelta(char dir, int *deltaRow, int *deltaColumn) {
+void getDelta(char dir) {
 
     switch (dir) {
         case 'u':
-            *deltaRow = -1;  // Moving up decreases the row index
-            *deltaColumn = 0;
+            deltaRow = -1;  // Moving up decreases the row index
+            deltaColumn = 0;
             break;
         case 'd':
-            *deltaRow = 1;   // Moving down increases the row index
-            *deltaColumn = 0;
+            deltaRow = 1;   // Moving down increases the row index
+            deltaColumn = 0;
             break;
         case 'l':
-            *deltaColumn = -1; // Moving left decreases the column index
-            *deltaRow = 0;
+            deltaColumn = -1; // Moving left decreases the column index
+            deltaRow = 0;
             break;
         case 'r':
-            *deltaColumn = 1;  // Moving right increases the column index
-            *deltaRow = 0;
+            deltaColumn = 1;  // Moving right increases the column index
+            deltaRow = 0;
             break;
     }
 }
@@ -287,10 +292,10 @@ void getDelta(char dir, int *deltaRow, int *deltaColumn) {
 void turnToDesiredDirection(char currentDirection, char desiredDirection) {
     // Directions in order: N -> E -> S -> W
     char directions[] = {'u', 'r', 'd', 'l'};
-    int currentIndex, desiredIndex;
+    short currentIndex, desiredIndex;
 
     // Find the index of the current and desired directions
-    for (int i = 0; i < 4; i++) {
+    for (short i = 0; i < 4; i++) {
         if (directions[i] == currentDirection) {
             currentIndex = i;
         }
@@ -300,7 +305,7 @@ void turnToDesiredDirection(char currentDirection, char desiredDirection) {
     }
 
     // Calculate the difference between the current and desired indices
-    int diff = desiredIndex - currentIndex;
+    short diff = desiredIndex - currentIndex;
 
     // Normalize the difference to be within the range [-3, 3]
     if (diff < -2) {
@@ -335,7 +340,7 @@ void turnToDesiredDirection(char currentDirection, char desiredDirection) {
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!to add the inferred wall functionality!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-void asssignSensedWalls(struct Cell array[][width], char dir, int row, int col, bool front, bool left, bool right){
+void asssignSensedWalls(struct Cell array[][width], char dir, short row, short col, bool front, bool left, bool right){
 
     bool firstTimeUseonly = true;
     switch (dir) {
@@ -404,7 +409,7 @@ void logging(char* text) {
     fflush(stderr);
 }
 
-void markWalls(int x, int y, bool NorthReading,bool WestReading,bool SouthReading,bool EastReading){
+void markWalls(short x, short y, bool NorthReading,bool WestReading,bool SouthReading,bool EastReading){
 
     if (WestReading)
         API_setWall(x, 15-y, 'w');
@@ -421,8 +426,8 @@ void markWalls(int x, int y, bool NorthReading,bool WestReading,bool SouthReadin
 
 void markAllKnownWallsInBeginning(struct Cell array[][16]){
 
-    for(int i  = 0; i<16;i++){
-        for(int j = 0; j<16;j++){
+    for(short i  = 0; i<16;i++){
+        for(short j = 0; j<16;j++){
             if (array[i][j].hasWallWest)
                 API_setWall(j, 15-i, 'w');
     
@@ -438,15 +443,64 @@ void markAllKnownWallsInBeginning(struct Cell array[][16]){
     } 
 }
 
-void markManhattanForEntireMaze(int arr[][width]){
+void markManhattanForEntireMaze(short arr[][width]){
 
-    for(int i  = 0; i<16;i++){
-        for(int j = 0; j<16;j++){
+    for(short i  = 0; i<16;i++){
+        for(short j = 0; j<16;j++){
             API_setText(j, 15-i,  arr[i][j]);        
         }
     }    
 }
 
+
+/*+++++++++++++++++++++++++++++====================++++++++++++++++++++++++++========================+++++++++++++++++++++++=====================++++++++++++++++++++++++================*/
+
+void moveToPointFromPoint(short goalX, short goalY, struct Cell maze[][width]){
+    short manhattan [height][width];
+    resetManhattanForFloodfill(manhattan,height,width,goalX,goalY);
+    floodfill(manhattan,maze,height,width,goalX,goalY);
+
+    while(!((currentX == goalX) && (currentY == goalY))){           
+            
+            char desiredDirection = 'x';//x= null
+            bool leftDetect = API_wallLeft();
+            bool rightDetect = API_wallRight();
+            bool frontDetect = API_wallFront();
+            asssignSensedWalls(maze,direction,currentY,currentX,frontDetect,leftDetect,rightDetect);
+            markWalls(currentX,currentY,maze[currentY][currentX].hasWallNorth,maze[currentY][currentX].hasWallWest,maze[currentY][currentX].hasWallSouth, maze[currentY][currentX].hasWallEast);
+          
+            if(currentY>0 && manhattan[currentY][currentX] > manhattan[currentY-1][currentX] && !maze[currentY][currentX].hasWallNorth)
+                desiredDirection = 'u';
+            else if (currentY<height-1 && manhattan[currentY][currentX] > manhattan[currentY+1][currentX] && !maze[currentY][currentX].hasWallSouth)
+                desiredDirection = 'd';
+            else if(currentX>0 && manhattan[currentY][currentX] > manhattan[currentY][currentX-1] && !maze[currentY][currentX].hasWallWest)
+                desiredDirection = 'l';
+            else if(currentX<width-1 && manhattan[currentY][currentX] > manhattan[currentY][currentX+1] && !maze[currentY][currentX].hasWallEast)
+                desiredDirection = 'r';
+    
+            if(desiredDirection == 'x'){
+                resetManhattanForFloodfill(manhattan,height,width,goalX,goalY);// Then: defining the center as manhattan goal
+                floodfill(manhattan,maze,height,width,goalX,goalY);
+                markManhattanForEntireMaze(manhattan);
+                //logging("is floodfilling");
+            }
+            else{
+                //logging("is turning");
+                turnToDesiredDirection(direction,desiredDirection);
+                direction = desiredDirection;
+                API_moveForward();
+                getDelta(direction);
+                currentX = currentX + deltaColumn;
+                currentY = currentY + deltaRow;
+            }
+
+            
+
+            
+
+        }
+
+}
 
 
 
@@ -462,9 +516,7 @@ int main(int argc, char* argv[]) {
 
 /*================================================================STATIC VALUES and INITIALIZATIONS====================================================================*/
     
-    int currentX = 0, currentY = 15;    
-    char direction = 'u'; //initial Direction
-    int deltaRow = -1, deltaColumn = 0; //initial facing up step
+ //initial facing up step
     
     //char directions[] = {'u','l','d','r'};
     //int deltaX[] = {0,-1,0,1};
@@ -472,7 +524,7 @@ int main(int argc, char* argv[]) {
     //bool accessibility[] = {false,false,false,false};
     //short directionSense = 0; //initially facing up and the correct delta gets assigned automatically from same array index  
 
-    int manhattan [height][width];
+    //int manhattan [height][width];
     struct Cell maze[height][width];
 
     logging("Running...");
@@ -480,67 +532,22 @@ int main(int argc, char* argv[]) {
     //API_setText(0, 0, "abc");
 
     resetWallsWithBorder(maze); //First step of video: Assume maze no walls. Defined borders
-    resetManhattanForFloodfill(manhattan,height,width,width/2,height/2);// Then: defining the center as manhattan goal
-    floodfill(manhattan,maze,height,width,width/2,height/2);
+    
+    
+
     
     //print2DArray(manhattan);
     markAllKnownWallsInBeginning(maze);
-    markManhattanForEntireMaze(manhattan);
 
-    while(1){
-        
-        while(!((currentX == 8) && (currentY == 8))){           
-            
-            char desiredDirection = 'x';//x= null
-            bool leftDetect = API_wallLeft();
-            bool rightDetect = API_wallRight();
-            bool frontDetect = API_wallFront();
-            asssignSensedWalls(maze,direction,currentY,currentX,frontDetect,leftDetect,rightDetect);
-            markWalls(currentX,currentY,maze[currentY][currentX].hasWallNorth,maze[currentY][currentX].hasWallWest,maze[currentY][currentX].hasWallSouth, maze[currentY][currentX].hasWallEast);
-            markManhattanForEntireMaze(manhattan);
-            //fprintf(stderr,"%d %d %d\n",frontDetect,leftDetect,rightDetect);
-            /*fprintf(stderr,"At (%d  %d) walls in North West South and East are %d %d %d %d \n", currentX, currentY, maze[currentY][currentX].hasWallNorth,
-                                                                                                                 maze[currentY][currentX].hasWallWest,
-                                                                                                                 maze[currentY][currentX].hasWallSouth,
-                                                                                                                 maze[currentY][currentX].hasWallEast); */
-            //fflush(stderr);
+    moveToPointFromPoint(8,8,maze);
 
-            if(currentY>0 && manhattan[currentY][currentX] > manhattan[currentY-1][currentX] && !maze[currentY][currentX].hasWallNorth)
-                desiredDirection = 'u';
-            else if (currentY<height-1 && manhattan[currentY][currentX] > manhattan[currentY+1][currentX] && !maze[currentY][currentX].hasWallSouth)
-                desiredDirection = 'd';
-            else if(currentX>0 && manhattan[currentY][currentX] > manhattan[currentY][currentX-1] && !maze[currentY][currentX].hasWallWest)
-                desiredDirection = 'l';
-            else if(currentX<width-1 && manhattan[currentY][currentX] > manhattan[currentY][currentX+1] && !maze[currentY][currentX].hasWallEast)
-                desiredDirection = 'r';
-    
-            if(desiredDirection == 'x'){
-                resetManhattanForFloodfill(manhattan,height,width,width/2,height/2);// Then: defining the center as manhattan goal
-                floodfill(manhattan,maze,height,width,width/2,height/2);
-                markManhattanForEntireMaze(manhattan);
-                //logging("is floodfilling");
-            }
-            else{
-                //logging("is turning");
-                turnToDesiredDirection(direction,desiredDirection);
-                direction = desiredDirection;
-                API_moveForward();
-                getDelta(direction,&deltaRow,&deltaColumn);
-                currentX = currentX + deltaColumn;
-                currentY = currentY + deltaRow;
-            }
+    logging("Reached at goal");
+    logging("Returning back to starting point is to be implemented easily tho");
 
-            
+    moveToPointFromPoint(0,15,maze);
+    logging("Reached at start");
 
-            
-
-        }
-        //fprintf(stderr,"and %d %d\n",currentX,currentY);
-        //fflush(stderr);
-        logging("Reached at goal");
-        logging("Returning back to starting point is to be implemented easily tho");
-        break;
-    }
+    moveToPointFromPoint(8,8,maze);
 
 
 }
