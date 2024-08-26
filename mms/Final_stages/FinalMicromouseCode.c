@@ -541,13 +541,29 @@ int main(int argc, char* argv[]) {
 
     moveToPointFromPoint(8,8,maze);
 
-    logging("Reached at goal");
-    logging("Returning back to starting point is to be implemented easily tho");
+    logging("Reached at goal 1 (8,8) ");
+    logging("Going towards Goal 2 (0,0)");
 
-    moveToPointFromPoint(0,15,maze);
-    logging("Reached at start");
+    moveToPointFromPoint(0,0,maze);
+    logging("Reached at Goal 2 (0,0)");
+    logging("Going towards Goal 3 (15,0)");
+
+    moveToPointFromPoint(15,0,maze);
+    logging("Reached at Goal 3 (15,0)");
+    logging("Going towards Goal 4 (8,8)");
 
     moveToPointFromPoint(8,8,maze);
+
+    logging("Reached at Goal 4 (8,8)");
+    logging("Going towards Goal 5 (15,15)");
+
+    moveToPointFromPoint(15,15,maze);
+
+    logging("Reached at Goal 5 (15,15)");
+    logging("Going towards Starting point (0,15)");
+
+    moveToPointFromPoint(0,15,maze);
+
 
 
 }
